@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2020 The MoKee Open Source Project
+# Copyright (C) 2020-2022 The MoKee Open Source Project
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -142,7 +142,7 @@ ENABLE_VENDOR_RIL_SERVICE := true
 TARGET_RIL_VARIANT := caf
 
 # Security patch level
-VENDOR_SECURITY_PATCH := 2019-09-01
+VENDOR_SECURITY_PATCH := 2021-06-01
 
 # SELinux
 include device/qcom/sepolicy/sepolicy.mk

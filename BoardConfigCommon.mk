@@ -119,12 +119,11 @@ TARGET_SYSTEM_PROP := $(COMMON_PATH)/system.prop $(COMMON_PATH)/system_meizu.pro
 
 # Recovery
 TARGET_RECOVERY_PIXEL_FORMAT := "BGRA_8888"
-TARGET_RECOVERY_FSTAB := $(COMMON_PATH)/recovery/root/recovery.fstab
+TARGET_RECOVERY_FSTAB := $(COMMON_PATH)/configs/recovery.fstab
 TARGET_USERIMAGES_USE_EXT4 := true
 TARGET_USES_MKE2FS := true
 
 # Releasetools
-TARGET_RECOVERY_UPDATER_LIBS := librecovery_updater_meizu_sdm710
 TARGET_RELEASETOOLS_EXTENSIONS := $(COMMON_PATH)
 
 # Root
@@ -156,10 +155,6 @@ BOARD_USES_QC_TIME_SERVICES := true
 
 # Treble
 PRODUCT_FULL_TREBLE_OVERRIDE := true
-
-# Verified Boot
-BOARD_AVB_ENABLE := true
-BOARD_AVB_MAKE_VBMETA_IMAGE_ARGS += --flags 3
 
 # Wi-Fi
 BOARD_HAS_QCOM_WLAN := true

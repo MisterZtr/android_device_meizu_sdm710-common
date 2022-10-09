@@ -16,39 +16,49 @@
 import common
 import re
 
-def FullOTA_Assertions(info):
-  AddModemAssertion(info)
+def FullOTA_InstallBegin(info):
+  OTA_InstallFirmware(info)
   return
 
-def IncrementalOTA_Assertions(info):
-  AddModemAssertion(info)
-  return
-
-def FullOTA_InstallEnd(info):
-  OTA_InstallEnd(info)
-  return
-
-def IncrementalOTA_InstallEnd(info):
-  OTA_InstallEnd(info)
-  return
-
-def AddModemAssertion(info):
-  android_info = info.input_zip.read("OTA/android-info.txt")
-  m = re.search(r'require\s+version-modem\s*=\s*(.+)', android_info)
-  if m:
-    version = m.group(1).rstrip()
-    if len(version) and '*' not in version:
-      cmd = 'assert(meizu_sdm710.verify_modem("' + version + '") == "1");'
-      info.script.AppendExtra(cmd)
+def IncrementalOTA_InstallBegin(info):
+  OTA_InstallFirmware(info)
   return
 
 def AddImage(info, basename, dest):
   name = basename
-  data = info.input_zip.read("IMAGES/" + basename)
+  data = info.input_zip.read("RADIO/" + basename)
   common.ZipWriteStr(info.output_zip, name, data)
+  info.script.Print("Flashing " + basename + "...")
   info.script.AppendExtra('package_extract_file("%s", "%s");' % (name, dest))
 
-def OTA_InstallEnd(info):
+def AddImageWithBak(info, basename, dest):
+  name = basename
+  data = info.input_zip.read("RADIO/" + basename)
+  common.ZipWriteStr(info.output_zip, name, data)
+  info.script.Print("Flashing " + basename + "...")
+  info.script.AppendExtra('package_extract_file("%s", "%s");' % (name, dest))
+  info.script.AppendExtra('package_extract_file("%s", "%s");' % (name, dest + "bak"))
+
+def OTA_InstallFirmware(info):
   info.script.Print("Patching firmware images...")
+  info.script.Print("Flashing...")
+  AddImageWithBak(info, "cmnlib64.mbn", "/dev/block/bootdevice/by-name/cmnlib64")
+  AddImageWithBak(info, "cmnlib.mbn", "/dev/block/bootdevice/by-name/cmnlib")
+  AddImageWithBak(info, "hyp.mbn", "/dev/block/bootdevice/by-name/hyp")
+  AddImageWithBak(info, "tz.mbn", "/dev/block/bootdevice/by-name/tz")
+  AddImageWithBak(info, "aop.mbn", "/dev/block/bootdevice/by-name/aop")
+  AddImageWithBak(info, "xbl_config.elf", "/dev/block/bootdevice/by-name/xbl_config")
+  AddImageWithBak(info, "keymaster64.mbn", "/dev/block/bootdevice/by-name/keymaster")
+  AddImageWithBak(info, "qupv3fw.elf", "/dev/block/bootdevice/by-name/qupfw")
+  AddImageWithBak(info, "abl.elf", "/dev/block/bootdevice/by-name/abl")
+  AddImageWithBak(info, "dtbo.img", "/dev/block/bootdevice/by-name/dtbo")
+  AddImageWithBak(info, "devcfg.mbn", "/dev/block/bootdevice/by-name/devcfg")
+  AddImageWithBak(info, "storsec.mbn", "/dev/block/bootdevice/by-name/storsec")
+  AddImageWithBak(info, "xbl.elf", "/dev/block/bootdevice/by-name/xbl")
+  info.script.Print("Finalizing...")
+  AddImage(info, "dspso.bin", "/dev/block/bootdevice/by-name/dsp")
+  AddImage(info, "NON-HLOS.bin", "/dev/block/bootdevice/by-name/modem")
+  AddImage(info, "BTFM.bin", "/dev/block/bootdevice/by-name/bluetooth")
   AddImage(info, "vbmeta.img", "/dev/block/bootdevice/by-name/vbmeta")
+  info.script.Print("Firmware images patched successfully!")
   return
